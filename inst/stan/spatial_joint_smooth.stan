@@ -14,6 +14,7 @@ data {
   int<lower=0> N_edges; // number of edges
   int<lower=0> K; // num covariates
   int ind_data[N_data];         // indices of non-missing data
+  int<lower=0> na[N_data];      // number of sampled units in area
   int<lower=0> df[N_data];      // number of degrees of freedom
   int<lower=1, upper=N> n1[N_edges]; // n1[i] adjacent to node2[i]
   int<lower=1, upper=N> n2[N_edges]; //
@@ -66,9 +67,9 @@ transformed parameters {
     theta = theta + X * betas;
   }
   for (i in 1:N_data) {
-    sigma_e[i] = sqrt(exp(g0 + g1 * log(theta[ind_data[i]] * (1 - theta[ind_data[i]])) + g2 * log(df[i]) + sigma_tau * tau[i]));
+    sigma_e[i] = sqrt(exp(g0 + g1 * log(theta[ind_data[i]] * (1 - theta[ind_data[i]])) + g2 * log(na[i]) + sigma_tau * tau[i]));
     V[i] = pow(sigma_e[i], 2);
-    ss_cl[i] = (df[i] - 1) * Vhat[i] / V[i];
+    ss_cl[i] = (df[i]) * Vhat[i] / V[i];
   }
 }
 
@@ -94,7 +95,7 @@ model {
   target += normal_lpdf(tau | 0, 1);
   for (i in 1:N_data) {
     theta_k = ind_data[i];
-    target += chi_square_lpdf(ss_cl[i] | df[i] - 1);
+    target += chi_square_lpdf(ss_cl[i] | df[i]);
     target += normal_lpdf(Yhat[i] | theta[theta_k], sigma_e[i]);
   }
 }
