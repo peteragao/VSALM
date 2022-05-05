@@ -71,7 +71,7 @@ prepare_bym2 <- function(adj_mat) {
 #' @export
 #'
 #' @examples
-spatialJointLogitVS <- function(Yhat, Vhat,
+spatialJointSmoothLogit <- function(Yhat, Vhat,
                                 domain, df,
                                 adj_mat, X = NULL,
                                 pc_u = c(1, .01),
@@ -130,7 +130,7 @@ spatialJointLogitVS <- function(Yhat, Vhat,
   }
 
   out_stan <- sampling(
-    stanmodels$spatial_joint_logit,
+    stanmodels$spatial_joint_smooth_logit,
     data = dat,         # named list of data
     chains = chains,         # number of Markov chains
     warmup = warmup,      # number of warmup iterations per chain
@@ -140,22 +140,7 @@ spatialJointLogitVS <- function(Yhat, Vhat,
     seed = seed,
     ...
   )
-  draws <- as.matrix(out_stan)
-  out_summary <- summary(out_stan, probs = c(0.05, 0.25, 0.50, 0.75, 0.95))$summary
-  combined_draws <- t(SUMMER::expit(draws[, grep("theta", colnames(draws))]))
-  out_theta <-
-    out_summary[grep("theta", rownames(out_summary)), ]
-  out_est <- data.frame(
-    domain = domain,
-    mean = NA, median = NA, var = NA,
-    lower = NA, upper = NA
-  )
-  out_est$mean <- SUMMER::expit(out_theta[, 1])
-  out_est$median <- SUMMER::expit(out_theta[, 6])
-  out_est$var <- apply(combined_draws, 1, var)
-  out_est$lower <- SUMMER::expit(out_theta[, 4])
-  out_est$upper <- SUMMER::expit(out_theta[, 8])
-  out_est$method <-  "spatialJointLogitVS"
+  out_est <- summarize_estimates(domain, out_stan, "spatialJointSmoothLogit", logit = T)
   if (detailed_output) {
     return(
       list(
@@ -166,7 +151,514 @@ spatialJointLogitVS <- function(Yhat, Vhat,
   }
   out_est
 }
-summarize_estimates <- function(stan_obj) {
+#' Title
+#'
+#' @param Yhat
+#' @param Vhat
+#' @param domain
+#' @param df
+#' @param adj_mat
+#' @param X
+#' @param pc_u
+#' @param pc_tau
+#' @param var_tol
+#' @param initf
+#' @param seed
+#' @param ...
+#'
+#' @return
+#' @import Matrix
+#' @export
+#'
+#' @examples
+spatialJointSmooth <- function(Yhat, Vhat,
+                                    domain, df,
+                                    adj_mat, X = NULL,
+                                    pc_u = c(1, .01),
+                                    pc_tau = c(1, .01),
+                                    var_tol = 1e-5,
+                                    initf = NULL, seed = NULL,
+                                    detailed_output = F,
+                                    chains = 4,
+                                    warmup = 2000,
+                                    iter = 4000,
+                                    ...) {
+  if(is.null(seed)) {
+    seed = 20220504
+  }
+  direct_est <- data.frame(
+    domain = domain,
+    Yhat = Yhat,
+    Vhat = Vhat
+  )
+  to_smooth <- direct_est$Vhat > var_tol
+  if (is.null(X)) {
+    X <-  matrix(0, nrow = length(Yhat), ncol = 0)
+  }
 
+  prepped <- prepare_bym2(adj_mat)
+
+  dat <- list(N = length(to_smooth),
+              N_data = sum(to_smooth),
+              ind_data = which(to_smooth),
+              df = df[to_smooth],
+              N_edges = length(prepped$n1),
+              n1 = prepped$n1,
+              n2 = prepped$n2,
+              K = ncol(X),
+              Yhat = Yhat[to_smooth],
+              Vhat = Vhat[to_smooth],
+              X = X[to_smooth,,drop = F],
+              scaling_factor = prepped$scaling_factor,
+              pc_u_v = pc_u[1],
+              pc_u_alpha = pc_u[2],
+              pc_tau_v = pc_tau[1],
+              pc_tau_alpha = pc_tau[2])
+  if (is.null(initf)) {
+    initf <- function() {
+      list(theta = rep(SUMMER::logit(.05), length(to_smooth)),
+           sigma_u = runif(1, .001, .3),
+           phi = runif(1, .001, .999),
+           u_ns = rnorm(length(to_smooth), 0, .1),
+           u_sp = rnorm(length(to_smooth), 0, .1),
+           g0 = rnorm(1, 0, .5),
+           g1 = rnorm(1, 1, .5),
+           g2 = rnorm(1, 1, .5),
+           sigma_tau = runif(1, .001, .3),
+           tau = rnorm(sum(to_smooth), 0, .1))
+    }
+  }
+
+  out_stan <- sampling(
+    stanmodels$spatial_joint_smooth,
+    data = dat,         # named list of data
+    chains = chains,         # number of Markov chains
+    warmup = warmup,      # number of warmup iterations per chain
+    iter = iter,        # total number of iterations per chain
+    cores = 1,          # number of cores
+    init = initf,
+    seed = seed,
+    ...
+  )
+  out_est <- summarize_estimates(domain, out_stan, "spatialJointSmooth", logit = F)
+  if (detailed_output) {
+    return(
+      list(
+        stan = out_stan,
+        est = out_est
+      )
+    )
+  }
+  out_est
 }
+#' Title
+#'
+#' @param Yhat
+#' @param Vhat
+#' @param domain
+#' @param df
+#' @param adj_mat
+#' @param X
+#' @param pc_u
+#' @param pc_tau
+#' @param var_tol
+#' @param initf
+#' @param seed
+#' @param ...
+#'
+#' @return
+#' @import Matrix
+#' @export
+#'
+#' @examples
+spatialJointSmoothUnmatched <- function(Yhat, Vhat,
+                               domain, df,
+                               adj_mat, X = NULL,
+                               pc_u = c(1, .01),
+                               pc_tau = c(1, .01),
+                               var_tol = 1e-5,
+                               initf = NULL, seed = NULL,
+                               detailed_output = F,
+                               chains = 4,
+                               warmup = 2000,
+                               iter = 4000,
+                               ...) {
+  if(is.null(seed)) {
+    seed = 20220504
+  }
+  direct_est <- data.frame(
+    domain = domain,
+    Yhat = Yhat,
+    Vhat = Vhat
+  )
+  to_smooth <- direct_est$Vhat > var_tol
+  if (is.null(X)) {
+    X <-  matrix(0, nrow = length(Yhat), ncol = 0)
+  }
 
+  prepped <- prepare_bym2(adj_mat)
+
+  dat <- list(N = length(to_smooth),
+              N_data = sum(to_smooth),
+              ind_data = which(to_smooth),
+              df = df[to_smooth],
+              N_edges = length(prepped$n1),
+              n1 = prepped$n1,
+              n2 = prepped$n2,
+              K = ncol(X),
+              Yhat = Yhat[to_smooth],
+              Vhat = Vhat[to_smooth],
+              X = X[to_smooth,,drop = F],
+              scaling_factor = prepped$scaling_factor,
+              pc_u_v = pc_u[1],
+              pc_u_alpha = pc_u[2],
+              pc_tau_v = pc_tau[1],
+              pc_tau_alpha = pc_tau[2])
+  if (is.null(initf)) {
+    initf <- function() {
+      list(theta = rep(SUMMER::logit(.05), length(to_smooth)),
+           sigma_u = runif(1, .001, .3),
+           phi = runif(1, .001, .999),
+           u_ns = rnorm(length(to_smooth), 0, .1),
+           u_sp = rnorm(length(to_smooth), 0, .1),
+           g0 = rnorm(1, 0, .5),
+           g1 = rnorm(1, 1, .5),
+           g2 = rnorm(1, 1, .5),
+           sigma_tau = runif(1, .001, .3),
+           tau = rnorm(sum(to_smooth), 0, .1))
+    }
+  }
+
+  out_stan <- sampling(
+    stanmodels$spatial_joint_smooth_unmatched,
+    data = dat,         # named list of data
+    chains = chains,         # number of Markov chains
+    warmup = warmup,      # number of warmup iterations per chain
+    iter = iter,        # total number of iterations per chain
+    cores = 1,          # number of cores
+    init = initf,
+    seed = seed,
+    ...
+  )
+  out_est <- summarize_estimates(domain, out_stan, "spatialJointSmoothUnmatched", logit = F)
+  if (detailed_output) {
+    return(
+      list(
+        stan = out_stan,
+        est = out_est
+      )
+    )
+  }
+  out_est
+}
+#' Title
+#'
+#' @param out_stan
+#' @param method
+#' @param logit
+#'
+#' @return
+#' @import SUMMER
+#' @export
+#'
+#' @examples
+summarize_estimates <- function(domain, out_stan, method, logit = F) {
+  draws <- as.matrix(out_stan)
+  out_summary <- summary(out_stan, probs = c(0.05, 0.25, 0.50, 0.75, 0.95))$summary
+  combined_draws <- t(draws[, grep("theta", colnames(draws))])
+  out_theta <-
+    out_summary[grep("theta", rownames(out_summary)), ]
+  if (logit) {
+    combined_draws <- SUMMER::expit(combined_draws)
+    out_theta <- SUMMER::expit(out_theta)
+  }
+
+  out_est <- data.frame(
+    domain = domain,
+    mean = NA, median = NA, var = NA,
+    lower = NA, upper = NA
+  )
+  out_est$mean <- out_theta[, 1]
+  out_est$median <- out_theta[, 6]
+  out_est$var <- apply(combined_draws, 1, var)
+  out_est$lower <- out_theta[, 4]
+  out_est$upper <- out_theta[, 8]
+  out_est$method <-  method
+  return(out_est)
+}
+#' Title
+#'
+#' @param Yhat
+#' @param Vhat
+#' @param domain
+#' @param adj_mat
+#' @param X
+#' @param pc_u
+#' @param var_tol
+#' @param initf
+#' @param seed
+#' @param detailed_output
+#' @param chains
+#' @param warmup
+#' @param iter
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+spatialMeanSmooth <- function(Yhat, Vhat,
+                              domain,
+                              adj_mat, X = NULL,
+                              pc_u = c(1, .01),
+                              var_tol = 1e-5,
+                              initf = NULL, seed = NULL,
+                              detailed_output = F,
+                              chains = 4,
+                              warmup = 2000,
+                              iter = 4000,
+                              ...) {
+  if(is.null(seed)) {
+    seed = 20220504
+  }
+  direct_est <- data.frame(
+    domain = domain,
+    Yhat = Yhat,
+    Vhat = Vhat
+  )
+  to_smooth <- direct_est$Vhat > var_tol
+  if (is.null(X)) {
+    X <-  matrix(0, nrow = length(Yhat), ncol = 0)
+  }
+
+  prepped <- prepare_bym2(adj_mat)
+
+  dat <- list(N = length(to_smooth),
+              N_data = sum(to_smooth),
+              ind_data = which(to_smooth),
+              N_edges = length(prepped$n1),
+              n1 = prepped$n1,
+              n2 = prepped$n2,
+              K = ncol(X),
+              Yhat = Yhat[to_smooth],
+              Vhat = Vhat[to_smooth],
+              X = X[to_smooth,,drop = F],
+              scaling_factor = prepped$scaling_factor,
+              pc_u_v = pc_u[1],
+              pc_u_alpha = pc_u[2])
+  if (is.null(initf)) {
+    initf <- function() {
+      list(theta = rep(.5, length(to_smooth)),
+           sigma_u = runif(1, .001, .3),
+           phi = runif(1, .001, .999),
+           u_ns = rnorm(length(to_smooth), 0, .1),
+           u_sp = rnorm(length(to_smooth), 0, .1))
+    }
+  }
+
+  out_stan <- sampling(
+    stanmodels$spatial_mean_smooth,
+    data = dat,         # named list of data
+    chains = chains,         # number of Markov chains
+    warmup = warmup,      # number of warmup iterations per chain
+    iter = iter,        # total number of iterations per chain
+    cores = 1,          # number of cores
+    init = initf,
+    seed = seed,
+    ...
+  )
+  out_est <- summarize_estimates(domain, out_stan, "spatialMeanSmooth", logit = F)
+  if (detailed_output) {
+    return(
+      list(
+        stan = out_stan,
+        est = out_est
+      )
+    )
+  }
+  out_est
+}
+#' Title
+#'
+#' @param Yhat
+#' @param Vhat
+#' @param domain
+#' @param adj_mat
+#' @param X
+#' @param pc_u
+#' @param var_tol
+#' @param initf
+#' @param seed
+#' @param detailed_output
+#' @param chains
+#' @param warmup
+#' @param iter
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+spatialMeanSmoothLogit <- function(Yhat, Vhat,
+                              domain,
+                              adj_mat, X = NULL,
+                              pc_u = c(1, .01),
+                              var_tol = 1e-5,
+                              initf = NULL, seed = NULL,
+                              detailed_output = F,
+                              chains = 4,
+                              warmup = 2000,
+                              iter = 4000,
+                              ...) {
+  if(is.null(seed)) {
+    seed = 20220504
+  }
+  direct_est <- data.frame(
+    domain = domain,
+    Yhat = SUMMER::logit(Yhat),
+    Vhat = Vhat / Yhat^2 / (1-Yhat)^2
+  )
+  to_smooth <- direct_est$Vhat > var_tol
+  if (is.null(X)) {
+    X <-  matrix(0, nrow = length(Yhat), ncol = 0)
+  }
+
+  prepped <- prepare_bym2(adj_mat)
+
+  dat <- list(N = length(to_smooth),
+              N_data = sum(to_smooth),
+              ind_data = which(to_smooth),
+              N_edges = length(prepped$n1),
+              n1 = prepped$n1,
+              n2 = prepped$n2,
+              K = ncol(X),
+              Yhat = direct_est$Yhat[to_smooth],
+              Vhat = direct_est$Vhat[to_smooth],
+              X = X[to_smooth,,drop = F],
+              scaling_factor = prepped$scaling_factor,
+              pc_u_v = pc_u[1],
+              pc_u_alpha = pc_u[2])
+  if (is.null(initf)) {
+    initf <- function() {
+      list(theta = rep(.5, length(to_smooth)),
+           sigma_u = runif(1, .001, .3),
+           phi = runif(1, .001, .999),
+           u_ns = rnorm(length(to_smooth), 0, .1),
+           u_sp = rnorm(length(to_smooth), 0, .1))
+    }
+  }
+
+  out_stan <- sampling(
+    stanmodels$spatial_mean_smooth,
+    data = dat,         # named list of data
+    chains = chains,         # number of Markov chains
+    warmup = warmup,      # number of warmup iterations per chain
+    iter = iter,        # total number of iterations per chain
+    cores = 1,          # number of cores
+    init = initf,
+    seed = seed,
+    ...
+  )
+  out_est <- summarize_estimates(domain, out_stan, "spatialMeanSmoothLogit", logit = T)
+  if (detailed_output) {
+    return(
+      list(
+        stan = out_stan,
+        est = out_est
+      )
+    )
+  }
+  out_est
+}
+#' Title
+#'
+#' @param Yhat
+#' @param Vhat
+#' @param domain
+#' @param adj_mat
+#' @param X
+#' @param pc_u
+#' @param var_tol
+#' @param initf
+#' @param seed
+#' @param detailed_output
+#' @param chains
+#' @param warmup
+#' @param iter
+#' @param ...
+#'
+#' @return
+#' @export
+#'
+#' @examples
+spatialMeanSmoothUnmatched <- function(Yhat, Vhat,
+                              domain,
+                              adj_mat, X = NULL,
+                              pc_u = c(1, .01),
+                              var_tol = 1e-5,
+                              initf = NULL, seed = NULL,
+                              detailed_output = F,
+                              chains = 4,
+                              warmup = 2000,
+                              iter = 4000,
+                              ...) {
+  if(is.null(seed)) {
+    seed = 20220504
+  }
+  direct_est <- data.frame(
+    domain = domain,
+    Yhat = Yhat,
+    Vhat = Vhat
+  )
+  to_smooth <- direct_est$Vhat > var_tol
+  if (is.null(X)) {
+    X <-  matrix(0, nrow = length(Yhat), ncol = 0)
+  }
+
+  prepped <- prepare_bym2(adj_mat)
+
+  dat <- list(N = length(to_smooth),
+              N_data = sum(to_smooth),
+              ind_data = which(to_smooth),
+              N_edges = length(prepped$n1),
+              n1 = prepped$n1,
+              n2 = prepped$n2,
+              K = ncol(X),
+              Yhat = Yhat[to_smooth],
+              Vhat = Vhat[to_smooth],
+              X = X[to_smooth,,drop = F],
+              scaling_factor = prepped$scaling_factor,
+              pc_u_v = pc_u[1],
+              pc_u_alpha = pc_u[2])
+  if (is.null(initf)) {
+    initf <- function() {
+      list(theta = rep(.5, length(to_smooth)),
+           sigma_u = runif(1, .001, .3),
+           phi = runif(1, .001, .999),
+           u_ns = rnorm(length(to_smooth), 0, .1),
+           u_sp = rnorm(length(to_smooth), 0, .1))
+    }
+  }
+
+  out_stan <- sampling(
+    stanmodels$spatial_mean_smooth_unmatched,
+    data = dat,         # named list of data
+    chains = chains,         # number of Markov chains
+    warmup = warmup,      # number of warmup iterations per chain
+    iter = iter,        # total number of iterations per chain
+    cores = 1,          # number of cores
+    init = initf,
+    seed = seed,
+    ...
+  )
+  out_est <- summarize_estimates(domain, out_stan, "spatialMeanSmoothUnmatched", logit = F)
+  if (detailed_output) {
+    return(
+      list(
+        stan = out_stan,
+        est = out_est
+      )
+    )
+  }
+  out_est
+}

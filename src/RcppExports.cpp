@@ -13,9 +13,19 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 
 
 RcppExport SEXP _rcpp_module_boot_stan_fit4spatial_joint_logit_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4spatial_joint_smooth_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4spatial_joint_smooth_logit_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4spatial_joint_smooth_unmatched_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4spatial_mean_smooth_mod();
+RcppExport SEXP _rcpp_module_boot_stan_fit4spatial_mean_smooth_unmatched_mod();
 
 static const R_CallMethodDef CallEntries[] = {
     {"_rcpp_module_boot_stan_fit4spatial_joint_logit_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4spatial_joint_logit_mod, 0},
+    {"_rcpp_module_boot_stan_fit4spatial_joint_smooth_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4spatial_joint_smooth_mod, 0},
+    {"_rcpp_module_boot_stan_fit4spatial_joint_smooth_logit_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4spatial_joint_smooth_logit_mod, 0},
+    {"_rcpp_module_boot_stan_fit4spatial_joint_smooth_unmatched_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4spatial_joint_smooth_unmatched_mod, 0},
+    {"_rcpp_module_boot_stan_fit4spatial_mean_smooth_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4spatial_mean_smooth_mod, 0},
+    {"_rcpp_module_boot_stan_fit4spatial_mean_smooth_unmatched_mod", (DL_FUNC) &_rcpp_module_boot_stan_fit4spatial_mean_smooth_unmatched_mod, 0},
     {NULL, NULL, 0}
 };
 
