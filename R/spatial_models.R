@@ -127,7 +127,7 @@ spatialJointSmooth <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -228,7 +228,7 @@ spatialJointSmoothUnmatched <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -329,7 +329,7 @@ spatialJointSmoothLogit <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -430,7 +430,7 @@ spatialMeanSmooth <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -522,7 +522,7 @@ spatialMeanSmoothLogit <- function(Yhat, Vhat,
     Yhat = SUMMER::logit(Yhat),
     Vhat = Vhat / Yhat^2 / (1-Yhat)^2
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -614,7 +614,7 @@ spatialMeanSmoothUnmatched <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }

@@ -36,7 +36,7 @@ iidMeanSmooth <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -54,7 +54,7 @@ iidMeanSmooth <- function(Yhat, Vhat,
     initf <- function() {
       list(theta_obs = rep(.5, length(to_smooth)),
            sigma_u = runif(1, .001, .3),
-           u = rnorm(length(to_smooth), 0, .1))
+           u = rnorm(sum(to_smooth), 0, .1))
     }
   }
 
@@ -118,7 +118,7 @@ iidMeanSmoothLogit <- function(Yhat, Vhat,
     Yhat = SUMMER::logit(Yhat),
     Vhat = Vhat / Yhat^2 / (1-Yhat)^2
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -136,7 +136,7 @@ iidMeanSmoothLogit <- function(Yhat, Vhat,
     initf <- function() {
       list(theta_obs = rep(.5, length(to_smooth)),
            sigma_u = runif(1, .001, .3),
-           u = rnorm(length(to_smooth), 0, .1))
+           u = rnorm(sum(to_smooth), 0, .1))
     }
   }
 
@@ -200,7 +200,7 @@ iidMeanSmoothUnmatched <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -218,7 +218,7 @@ iidMeanSmoothUnmatched <- function(Yhat, Vhat,
     initf <- function() {
       list(theta = rep(.5, length(to_smooth)),
            sigma_u = runif(1, .001, .3),
-           u = rnorm(length(to_smooth), 0, .1))
+           u = rnorm(sum(to_smooth), 0, .1))
     }
   }
 
@@ -283,7 +283,7 @@ iidJointSmooth <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -304,7 +304,7 @@ iidJointSmooth <- function(Yhat, Vhat,
     initf <- function() {
       list(theta = rep(SUMMER::logit(.05), length(to_smooth)),
            sigma_u = runif(1, .001, .3),
-           u = rnorm(length(to_smooth), 0, .1),
+           u = rnorm(sum(to_smooth), 0, .1),
            g0 = rnorm(1, 0, .5),
            g1 = rnorm(1, 1, .5),
            g2 = rnorm(1, 1, .5),
@@ -376,7 +376,7 @@ iidJointSmoothLogit <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -398,7 +398,7 @@ iidJointSmoothLogit <- function(Yhat, Vhat,
     initf <- function() {
       list(theta = rep(SUMMER::logit(.05), length(to_smooth)),
            sigma_u = runif(1, .001, .3),
-           u = rnorm(length(to_smooth), 0, .1),
+           u = rnorm(sum(to_smooth), 0, .1),
            g0 = rnorm(1, 0, .5),
            g1 = rnorm(1, 1, .5),
            g2 = rnorm(1, 1, .5),
@@ -468,7 +468,7 @@ iidJointSmoothUnmatched <- function(Yhat, Vhat,
     Yhat = Yhat,
     Vhat = Vhat
   )
-  to_smooth <- direct_est$Vhat > var_tol
+  to_smooth <- direct_est$Vhat > var_tol & !is.na(direct_est$Vhat)
   if (is.null(X)) {
     X <-  matrix(0, nrow = length(Yhat), ncol = 0)
   }
@@ -490,7 +490,7 @@ iidJointSmoothUnmatched <- function(Yhat, Vhat,
     initf <- function() {
       list(theta = rep(SUMMER::logit(.05), length(to_smooth)),
            sigma_u = runif(1, .001, .3),
-           u = rnorm(length(to_smooth), 0, .1),
+           u = rnorm(sum(to_smooth), 0, .1),
            g0 = rnorm(1, 0, .5),
            g1 = rnorm(1, 1, .5),
            g2 = rnorm(1, 1, .5),
