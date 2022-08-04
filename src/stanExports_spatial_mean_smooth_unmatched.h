@@ -33,7 +33,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_spatial_mean_smooth_unmatched");
-    reader.add_event(78, 76, "end", "model_spatial_mean_smooth_unmatched");
+    reader.add_event(79, 77, "end", "model_spatial_mean_smooth_unmatched");
     return reader;
 }
 template <bool propto, typename T0__, typename T1__, typename T2__>
@@ -514,26 +514,26 @@ public:
             stan::math::fill(theta_k, std::numeric_limits<int>::min());
             current_statement_begin__ = 59;
             if (as_bool(logical_gt(K, 0))) {
-                current_statement_begin__ = 60;
-                lp_accum__.add(normal_log<propto__>(betas, 0.0, 1.0));
+                current_statement_begin__ = 61;
+                lp_accum__.add(normal_log<propto__>(betas, 0.0, 31.62278));
             }
-            current_statement_begin__ = 62;
+            current_statement_begin__ = 63;
+            lp_accum__.add(normal_log(mu, 0, 31.62278));
+            current_statement_begin__ = 64;
             lp_accum__.add(beta_log<propto__>(phi, 0.5, 0.5));
-            current_statement_begin__ = 65;
-            lp_accum__.add((-(0.5) * dot_self(subtract(stan::model::rvalue(u_sp, stan::model::cons_list(stan::model::index_multi(n1), stan::model::nil_index_list()), "u_sp"), stan::model::rvalue(u_sp, stan::model::cons_list(stan::model::index_multi(n2), stan::model::nil_index_list()), "u_sp")))));
             current_statement_begin__ = 67;
-            lp_accum__.add(normal_log<propto__>(sum(u_sp), 0, (0.001 * N)));
+            lp_accum__.add((-(0.5) * dot_self(subtract(stan::model::rvalue(u_sp, stan::model::cons_list(stan::model::index_multi(n1), stan::model::nil_index_list()), "u_sp"), stan::model::rvalue(u_sp, stan::model::cons_list(stan::model::index_multi(n2), stan::model::nil_index_list()), "u_sp")))));
             current_statement_begin__ = 69;
-            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_u, 2)), pc_u_v, pc_u_alpha, pstream__));
-            current_statement_begin__ = 70;
-            lp_accum__.add(normal_log(mu, 0, 1));
+            lp_accum__.add(normal_log<propto__>(sum(u_sp), 0, (0.001 * N)));
             current_statement_begin__ = 71;
-            lp_accum__.add(normal_log(u_ns, 0, 1));
+            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_u, 2)), pc_u_v, pc_u_alpha, pstream__));
             current_statement_begin__ = 72;
+            lp_accum__.add(normal_log(u_ns, 0, 1));
+            current_statement_begin__ = 73;
             for (int i = 1; i <= N_data; ++i) {
-                current_statement_begin__ = 73;
-                stan::math::assign(theta_k, get_base1(ind_data, i, "ind_data", 1));
                 current_statement_begin__ = 74;
+                stan::math::assign(theta_k, get_base1(ind_data, i, "ind_data", 1));
+                current_statement_begin__ = 75;
                 lp_accum__.add(normal_log(get_base1(Yhat, i, "Yhat", 1), get_base1(theta, theta_k, "theta", 1), stan::math::sqrt(get_base1(Vhat, i, "Vhat", 1))));
             }
             }

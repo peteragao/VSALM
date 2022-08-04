@@ -57,8 +57,10 @@ transformed parameters {
 model {
   int theta_k; // indexing thetas
   if (K > 0) {
-    betas ~ normal(0.0, 1.0);
+    # precision ~ 1/1000
+    betas ~ normal(0.0, 31.62278);
   }
+  target += normal_lpdf(mu | 0, 31.62278);
   phi ~ beta(0.5, 0.5);
 
   // This is the prior for u_sp! (up to proportionality)
@@ -67,7 +69,6 @@ model {
   sum(u_sp) ~ normal(0, 0.001 * N); // equivalent to mean(u_sp) ~ normal(0,0.001)
 
   target += pcprec_lpdf(1 / pow(sigma_u, 2) | pc_u_v, pc_u_alpha);
-  target += normal_lpdf(mu | 0, 1);
   target += normal_lpdf(u_ns | 0, 1);
     for (i in 1:N_data) {
     theta_k = ind_data[i];

@@ -53,8 +53,10 @@ transformed parameters {
 model {
   int theta_k; // indexing thetas
   if (K > 0) {
-    betas ~ normal(0.0, 1.0);
+    # precision ~ 1000
+    betas ~ normal(0.0, 31.62278);
   }
+  target += normal_lpdf(mu | 0, 31.62278);
   for (i in 1:N_data) {
     theta_k = ind_data[i];
     target += normal_lpdf(Yhat[i] | theta_obs[theta_k], sqrt(Vhat[i]));

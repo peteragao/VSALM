@@ -648,21 +648,21 @@ public:
             stan::math::fill(theta_k, std::numeric_limits<int>::min());
             current_statement_begin__ = 72;
             if (as_bool(logical_gt(K, 0))) {
-                current_statement_begin__ = 73;
-                lp_accum__.add(normal_log<propto__>(betas, 0.0, 1.0));
+                current_statement_begin__ = 74;
+                lp_accum__.add(normal_log<propto__>(betas, 0.0, 31.62278));
             }
             current_statement_begin__ = 76;
-            lp_accum__.add(normal_log(g0, 0, 1));
+            lp_accum__.add(normal_log(mu, 0, 31.62278));
             current_statement_begin__ = 77;
-            lp_accum__.add(normal_log(g1, -(1), .5));
+            lp_accum__.add(normal_log(g0, 0, 1));
             current_statement_begin__ = 78;
+            lp_accum__.add(normal_log(g1, -(1), .5));
+            current_statement_begin__ = 79;
             lp_accum__.add(normal_log(g2, -(1), .5));
-            current_statement_begin__ = 80;
-            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_u, 2)), pc_u_v, pc_u_alpha, pstream__));
             current_statement_begin__ = 81;
-            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_tau, 2)), pc_tau_v, pc_tau_alpha, pstream__));
+            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_u, 2)), pc_u_v, pc_u_alpha, pstream__));
             current_statement_begin__ = 82;
-            lp_accum__.add(normal_log(mu, 0, 5));
+            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_tau, 2)), pc_tau_v, pc_tau_alpha, pstream__));
             current_statement_begin__ = 83;
             lp_accum__.add(normal_log(u, 0, 1));
             current_statement_begin__ = 84;

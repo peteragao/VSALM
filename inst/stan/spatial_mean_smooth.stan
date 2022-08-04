@@ -22,7 +22,7 @@ data {
   real Yhat[N_data]; // direct estimates of small area means
   real<lower=0> Vhat[N_data];  // variance estimates of direct estimates
   matrix[N, K] X; // design matrix
-  
+
   // HYPERPARAMETERS
   real<lower=0> scaling_factor; // scales the variance of the spatial effects
   real<lower=0> pc_u_v;
@@ -31,9 +31,9 @@ data {
 
 parameters {
 // FIXED EFFECTS
-  real mu; 
-  vector[K] betas; // covariates  
-  
+  real mu;
+  vector[K] betas; // covariates
+
   // RANDOM EFFECTS
   vector[N] u_ns; // (scaled) area effects for sampled areas
 
@@ -56,17 +56,18 @@ transformed parameters {
 model {
   int theta_k; // indexing thetas
   if (K > 0) {
-    betas ~ normal(0.0, 1.0);
+    # precision ~ 1/1000
+    betas ~ normal(0.0, 31.62278);
   }
+  target += normal_lpdf(mu | 0, 31.62278);
   phi ~ beta(0.5, 0.5);
 
   // This is the prior for u_sp! (up to proportionality)
   target += -0.5 * dot_self(u_sp[n1] - u_sp[n2]);
   // soft sum-to-zero constraint on u_sp)
   sum(u_sp) ~ normal(0, 0.001 * N); // equivalent to mean(u_sp) ~ normal(0,0.001)
- 
+
   target += pcprec_lpdf(1 / pow(sigma_u, 2) | pc_u_v, pc_u_alpha);
-  target += normal_lpdf(mu | 0, 1);
   target += normal_lpdf(u_ns | 0, 1);
     for (i in 1:N_data) {
     theta_k = ind_data[i];

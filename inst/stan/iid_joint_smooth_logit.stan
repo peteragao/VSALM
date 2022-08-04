@@ -70,8 +70,10 @@ transformed parameters {
 model {
   int theta_k; // indexing thetas
   if (K > 0) {
-    betas ~ normal(0.0, 1.0);
+    # precision ~ 1000
+    betas ~ normal(0.0, 31.62278);
   }
+  target += normal_lpdf(mu | 0, 31.62278);
 
   target += normal_lpdf(g0 | 0, 1);
   target += normal_lpdf(g1 | -1, .5);
@@ -79,7 +81,6 @@ model {
 
   target += pcprec_lpdf(1 / pow(sigma_u, 2) | pc_u_v, pc_u_alpha);
   target += pcprec_lpdf(1 / pow(sigma_tau, 2) | pc_tau_v, pc_tau_alpha);
-  target += normal_lpdf(mu | 0, 5);
   target += normal_lpdf(u | 0, 1);
   target += normal_lpdf(tau | 0, 1);
   for (i in 1:N_data) {

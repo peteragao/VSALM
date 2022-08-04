@@ -33,7 +33,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_spatial_joint_smooth_unmatched");
-    reader.add_event(104, 102, "end", "model_spatial_joint_smooth_unmatched");
+    reader.add_event(105, 103, "end", "model_spatial_joint_smooth_unmatched");
     return reader;
 }
 template <bool propto, typename T0__, typename T1__, typename T2__>
@@ -753,38 +753,38 @@ public:
             stan::math::fill(theta_k, std::numeric_limits<int>::min());
             current_statement_begin__ = 79;
             if (as_bool(logical_gt(K, 0))) {
-                current_statement_begin__ = 80;
-                lp_accum__.add(normal_log<propto__>(betas, 0.0, 1.0));
+                current_statement_begin__ = 81;
+                lp_accum__.add(normal_log<propto__>(betas, 0.0, 31.62278));
             }
-            current_statement_begin__ = 82;
-            lp_accum__.add(beta_log<propto__>(phi, 0.5, 0.5));
+            current_statement_begin__ = 83;
+            lp_accum__.add(normal_log(mu, 0, 31.62278));
             current_statement_begin__ = 84;
-            lp_accum__.add(normal_log(g0, 0, 1));
-            current_statement_begin__ = 85;
-            lp_accum__.add(normal_log(g1, -(1), .5));
+            lp_accum__.add(beta_log<propto__>(phi, 0.5, 0.5));
             current_statement_begin__ = 86;
-            lp_accum__.add(normal_log(g2, -(1), .5));
+            lp_accum__.add(normal_log(g0, 0, 1));
+            current_statement_begin__ = 87;
+            lp_accum__.add(normal_log(g1, -(1), .5));
             current_statement_begin__ = 88;
-            lp_accum__.add((-(0.5) * dot_self(subtract(stan::model::rvalue(u_sp, stan::model::cons_list(stan::model::index_multi(n1), stan::model::nil_index_list()), "u_sp"), stan::model::rvalue(u_sp, stan::model::cons_list(stan::model::index_multi(n2), stan::model::nil_index_list()), "u_sp")))));
+            lp_accum__.add(normal_log(g2, -(1), .5));
             current_statement_begin__ = 90;
-            lp_accum__.add(normal_log<propto__>(sum(u_sp), 0, (0.001 * N)));
+            lp_accum__.add((-(0.5) * dot_self(subtract(stan::model::rvalue(u_sp, stan::model::cons_list(stan::model::index_multi(n1), stan::model::nil_index_list()), "u_sp"), stan::model::rvalue(u_sp, stan::model::cons_list(stan::model::index_multi(n2), stan::model::nil_index_list()), "u_sp")))));
             current_statement_begin__ = 92;
-            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_u, 2)), pc_u_v, pc_u_alpha, pstream__));
-            current_statement_begin__ = 93;
-            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_tau, 2)), pc_tau_v, pc_tau_alpha, pstream__));
+            lp_accum__.add(normal_log<propto__>(sum(u_sp), 0, (0.001 * N)));
             current_statement_begin__ = 94;
-            lp_accum__.add(normal_log(mu, 0, 5));
+            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_u, 2)), pc_u_v, pc_u_alpha, pstream__));
             current_statement_begin__ = 95;
-            lp_accum__.add(normal_log(u_ns, 0, 1));
+            lp_accum__.add(pcprec_lpdf((1 / pow(sigma_tau, 2)), pc_tau_v, pc_tau_alpha, pstream__));
             current_statement_begin__ = 96;
-            lp_accum__.add(normal_log(tau, 0, 1));
+            lp_accum__.add(normal_log(u_ns, 0, 1));
             current_statement_begin__ = 97;
+            lp_accum__.add(normal_log(tau, 0, 1));
+            current_statement_begin__ = 98;
             for (int i = 1; i <= N_data; ++i) {
-                current_statement_begin__ = 98;
-                stan::math::assign(theta_k, get_base1(ind_data, i, "ind_data", 1));
                 current_statement_begin__ = 99;
-                lp_accum__.add(chi_square_log(get_base1(ss_cl, i, "ss_cl", 1), get_base1(df, i, "df", 1)));
+                stan::math::assign(theta_k, get_base1(ind_data, i, "ind_data", 1));
                 current_statement_begin__ = 100;
+                lp_accum__.add(chi_square_log(get_base1(ss_cl, i, "ss_cl", 1), get_base1(df, i, "df", 1)));
+                current_statement_begin__ = 101;
                 lp_accum__.add(normal_log(get_base1(Yhat, i, "Yhat", 1), get_base1(theta, theta_k, "theta", 1), get_base1(sigma_e, i, "sigma_e", 1)));
             }
             }

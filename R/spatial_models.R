@@ -30,7 +30,7 @@ summarize_estimates <- function(domain, out_stan, method, logit = F) {
   )
   out_est$mean <- out_theta[, 1]
   out_est$median <- out_theta[, 6]
-  out_est$var <- apply(combined_draws, 1, var)
+  out_est$var <- apply(combined_draws, 1, var, na.rm = T)
   out_est$lower <- out_theta[, 4]
   out_est$upper <- out_theta[, 8]
   out_est$method <-  method

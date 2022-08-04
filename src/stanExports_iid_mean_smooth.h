@@ -33,7 +33,7 @@ static int current_statement_begin__;
 stan::io::program_reader prog_reader__() {
     stan::io::program_reader reader;
     reader.add_event(0, 0, "start", "model_iid_mean_smooth");
-    reader.add_event(74, 72, "end", "model_iid_mean_smooth");
+    reader.add_event(76, 74, "end", "model_iid_mean_smooth");
     return reader;
 }
 template <bool propto, typename T0__, typename T1__, typename T2__>
@@ -413,19 +413,21 @@ public:
             stan::math::fill(theta_k, std::numeric_limits<int>::min());
             current_statement_begin__ = 54;
             if (as_bool(logical_gt(K, 0))) {
-                current_statement_begin__ = 55;
-                lp_accum__.add(normal_log<propto__>(betas, 0.0, 1.0));
+                current_statement_begin__ = 56;
+                lp_accum__.add(normal_log<propto__>(betas, 0.0, 31.62278));
             }
-            current_statement_begin__ = 57;
+            current_statement_begin__ = 58;
+            lp_accum__.add(normal_log(mu, 0, 31.62278));
+            current_statement_begin__ = 59;
             for (int i = 1; i <= N_data; ++i) {
-                current_statement_begin__ = 58;
+                current_statement_begin__ = 60;
                 stan::math::assign(theta_k, get_base1(ind_data, i, "ind_data", 1));
-                current_statement_begin__ = 59;
+                current_statement_begin__ = 61;
                 lp_accum__.add(normal_log(get_base1(Yhat, i, "Yhat", 1), get_base1(theta_obs, theta_k, "theta_obs", 1), stan::math::sqrt(get_base1(Vhat, i, "Vhat", 1))));
             }
-            current_statement_begin__ = 61;
+            current_statement_begin__ = 63;
             lp_accum__.add(pcprec_lpdf((1 / pow(sigma_u, 2)), pc_u_v, pc_u_alpha, pstream__));
-            current_statement_begin__ = 62;
+            current_statement_begin__ = 64;
             lp_accum__.add(normal_log(u, 0, 1));
             }
         } catch (const std::exception& e) {
@@ -551,31 +553,31 @@ public:
             }
             if (!include_gqs__) return;
             // declare and define generated quantities
-            current_statement_begin__ = 65;
+            current_statement_begin__ = 67;
             validate_non_negative_index("theta", "N", N);
             Eigen::Matrix<double, Eigen::Dynamic, 1> theta(N);
             stan::math::initialize(theta, DUMMY_VAR__);
             stan::math::fill(theta, DUMMY_VAR__);
             // generated quantities statements
-            current_statement_begin__ = 66;
+            current_statement_begin__ = 68;
             for (int i = 1; i <= N; ++i) {
-                current_statement_begin__ = 67;
+                current_statement_begin__ = 69;
                 stan::model::assign(theta, 
                             stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
                             normal_rng(get_base1(theta_obs, i, "theta_obs", 1), sigma_u, base_rng__), 
                             "assigning variable theta");
             }
-            current_statement_begin__ = 69;
+            current_statement_begin__ = 71;
             for (auto& i : ind_data) {
                 (void) i;  // dummy to suppress unused var warning
-                current_statement_begin__ = 70;
+                current_statement_begin__ = 72;
                 stan::model::assign(theta, 
                             stan::model::cons_list(stan::model::index_uni(i), stan::model::nil_index_list()), 
                             get_base1(theta_obs, i, "theta_obs", 1), 
                             "assigning variable theta");
             }
             // validate, write generated quantities
-            current_statement_begin__ = 65;
+            current_statement_begin__ = 67;
             size_t theta_j_1_max__ = N;
             for (size_t j_1__ = 0; j_1__ < theta_j_1_max__; ++j_1__) {
                 vars__.push_back(theta(j_1__));
