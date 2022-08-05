@@ -1,20 +1,20 @@
-#' Title
+#' Mean smoothing only model with iid area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param X
-#' @param pc_u
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param detailed_output
-#' @param chains
-#' @param warmup
-#' @param iter
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @export
 #'
 #' @examples
@@ -80,23 +80,23 @@ iidMeanSmooth <- function(Yhat, Vhat,
   }
   out_est
 }
-#' Title
+#' Logit-mean smoothing only model with iid area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param X
-#' @param pc_u
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param detailed_output
-#' @param chains
-#' @param warmup
-#' @param iter
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @export
 #'
 #' @examples
@@ -162,23 +162,23 @@ iidMeanSmoothLogit <- function(Yhat, Vhat,
   }
   out_est
 }
-#' Title
+#' Unmatched mean smoothing only model with iid area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param X
-#' @param pc_u
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param detailed_output
-#' @param chains
-#' @param warmup
-#' @param iter
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @export
 #'
 #' @examples
@@ -244,21 +244,26 @@ iidMeanSmoothUnmatched <- function(Yhat, Vhat,
   }
   out_est
 }
-#' Title
+#' Joint smoothing model with iid area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param df
-#' @param X
-#' @param pc_u
-#' @param pc_tau
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param na vector of sample sizes for areas
+#' @param df vector of degrees of freedom for areas
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param pc_tau hyperparameters for prior c(t, alpha) such that P(sigma_tau > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @import Matrix
 #' @export
 #'
@@ -334,25 +339,26 @@ iidJointSmooth <- function(Yhat, Vhat,
   }
   out_est
 }
-#' Title
+#' Logit joint smoothing model with iid area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param df
-#' @param X
-#' @param pc_u
-#' @param pc_tau
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param detailed_output
-#' @param chains
-#' @param warmup
-#' @param iter
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param na vector of sample sizes for areas
+#' @param df vector of degrees of freedom for areas
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param pc_tau hyperparameters for prior c(t, alpha) such that P(sigma_tau > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @export
 #'
 #' @examples
@@ -429,21 +435,26 @@ iidJointSmoothLogit <- function(Yhat, Vhat,
   out_est
 }
 
-#' Title
+#' Unmatched joint smoothing model with iid area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param df
-#' @param X
-#' @param pc_u
-#' @param pc_tau
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param na vector of sample sizes for areas
+#' @param df vector of degrees of freedom for areas
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param pc_tau hyperparameters for prior c(t, alpha) such that P(sigma_tau > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @import Matrix
 #' @export
 #'

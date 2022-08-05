@@ -58,6 +58,7 @@ transformed parameters {
   }
   for (i in 1:N_data) {
     theta_obs[ind_data[i]] = theta_obs[ind_data[i]] + sigma_u * u[i];
+    // GVF
     sigma_e[i] = sqrt(exp(g0 + g1 * log(theta_obs[ind_data[i]] * (1 - theta_obs[ind_data[i]])) + g2 * log(na[i]) + sigma_tau * tau[i]));
     V[i] = pow(sigma_e[i], 2);
     ss_cl[i] = (df[i]) * Vhat[i] / V[i];

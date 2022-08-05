@@ -2,7 +2,7 @@
 % Please edit documentation in R/iid_models.R
 \name{iidMeanSmoothUnmatched}
 \alias{iidMeanSmoothUnmatched}
-\title{Title}
+\title{Unmatched mean smoothing only model with iid area effects}
 \usage{
 iidMeanSmoothUnmatched(
   Yhat,
@@ -21,11 +21,35 @@ iidMeanSmoothUnmatched(
 )
 }
 \arguments{
-\item{...}{}
+\item{Yhat}{vector of direct weighted estimates}
+
+\item{Vhat}{vector of estimated variances of direct weighted estimators}
+
+\item{domain}{vector of domain labels}
+
+\item{X}{matrix of area level covariates}
+
+\item{pc_u}{hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha}
+
+\item{var_tol}{tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing}
+
+\item{initf}{optional stan parameter with starting parameter values}
+
+\item{seed}{random seed}
+
+\item{detailed_output}{if T, return stan object as well as estimates}
+
+\item{chains}{number of chains for Stan}
+
+\item{warmup}{number of warm up samples per chain for Stan}
+
+\item{iter}{total number of samples per chain for Stan}
+
+\item{...}{additional parameters}
 }
 \value{
-
+A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 }
 \description{
-Title
+Unmatched mean smoothing only model with iid area effects
 }

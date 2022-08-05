@@ -1,15 +1,13 @@
 
-#' Title
+#' Summarize draws from posterior
 #'
-#' Title
+#' @param domain vector of domain labels
+#' @param out_stan stan object from fit
+#' @param method name of model
+#' @param logit if T, apply logit transform to draws
 #'
-#' @param out_stan
-#' @param method
-#' @param logit
-#'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @import SUMMER
-#' @export
 #'
 #' @examples
 summarize_estimates <- function(domain, out_stan, method, logit = F) {
@@ -36,11 +34,12 @@ summarize_estimates <- function(domain, out_stan, method, logit = F) {
   out_est$method <-  method
   return(out_est)
 }
-#' @param adj_mat
+#' Create list of nodes from adjacency matrix for spatial modeling
 #'
-#' @return
+#' @param adj_mat adjacency matrix
+#'
+#' @return list of two vectors of nodes that represent edges in graph
 #' @import Matrix
-#' @export
 #'
 #' @examples
 nb2mat_to_nodes <- function(adj_mat) {
@@ -61,13 +60,12 @@ nb2mat_to_nodes <- function(adj_mat) {
   return(list(n1 = n1, n2 = n2))
 }
 
-#' Title
+#' Prepare objects necessary for BYM2 model
 #'
-#' @param adj_mat
+#' @param adj_mat adjacency matrix
 #'
-#' @return
+#' @return list of two vectors of nodes that represent edges in graph and scaling factor necessary for precision matrix
 #' @import Matrix
-#' @export
 #'
 #' @examples
 prepare_bym2 <- function(adj_mat) {
@@ -87,38 +85,43 @@ prepare_bym2 <- function(adj_mat) {
 
 
 
-#' Title
+#' Joint smoothing model with BYM2 area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param df
-#' @param adj_mat
-#' @param X
-#' @param pc_u
-#' @param pc_tau
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param na vector of sample sizes for areas
+#' @param df vector of degrees of freedom for areas
+#' @param adj_mat adjacency matrix
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param pc_tau hyperparameters for prior c(t, alpha) such that P(sigma_tau > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @import Matrix
 #' @export
 #'
 #' @examples
 spatialJointSmooth <- function(Yhat, Vhat,
-                                    domain, na, df,
-                                    adj_mat, X = NULL,
-                                    pc_u = c(1, .01),
-                                    pc_tau = c(1, .01),
-                                    var_tol = 1e-5,
-                                    initf = NULL, seed = NULL,
-                                    detailed_output = F,
-                                    chains = 4,
-                                    warmup = 2000,
-                                    iter = 4000,
-                                    ...) {
+                               domain, na, df,
+                               adj_mat, X = NULL,
+                               pc_u = c(1, .01),
+                               pc_tau = c(1, .01),
+                               var_tol = 1e-5,
+                               initf = NULL, seed = NULL,
+                               detailed_output = F,
+                               chains = 4,
+                               warmup = 2000,
+                               iter = 4000,
+                               ...) {
   if(is.null(seed)) {
     seed = 20220504
   }
@@ -188,38 +191,43 @@ spatialJointSmooth <- function(Yhat, Vhat,
   }
   out_est
 }
-#' Title
+#' Unmatched joint smoothing model with BYM2 area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param df
-#' @param adj_mat
-#' @param X
-#' @param pc_u
-#' @param pc_tau
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param na vector of sample sizes for areas
+#' @param df vector of degrees of freedom for areas
+#' @param adj_mat adjacency matrix
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param pc_tau hyperparameters for prior c(t, alpha) such that P(sigma_tau > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @import Matrix
 #' @export
 #'
 #' @examples
 spatialJointSmoothUnmatched <- function(Yhat, Vhat,
-                               domain, na, df,
-                               adj_mat, X = NULL,
-                               pc_u = c(1, .01),
-                               pc_tau = c(1, .01),
-                               var_tol = 1e-5,
-                               initf = NULL, seed = NULL,
-                               detailed_output = F,
-                               chains = 4,
-                               warmup = 2000,
-                               iter = 4000,
-                               ...) {
+                                        domain, na, df,
+                                        adj_mat, X = NULL,
+                                        pc_u = c(1, .01),
+                                        pc_tau = c(1, .01),
+                                        var_tol = 1e-5,
+                                        initf = NULL, seed = NULL,
+                                        detailed_output = F,
+                                        chains = 4,
+                                        warmup = 2000,
+                                        iter = 4000,
+                                        ...) {
   if(is.null(seed)) {
     seed = 20220504
   }
@@ -289,22 +297,27 @@ spatialJointSmoothUnmatched <- function(Yhat, Vhat,
   }
   out_est
 }
-#' Title
+#' Logit joint smoothing model with BYM2 area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param df
-#' @param adj_mat
-#' @param X
-#' @param pc_u
-#' @param pc_tau
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param na vector of sample sizes for areas
+#' @param df vector of degrees of freedom for areas
+#' @param adj_mat adjacency matrix
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param pc_tau hyperparameters for prior c(t, alpha) such that P(sigma_tau > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @import Matrix
 #' @export
 #'
@@ -390,24 +403,24 @@ spatialJointSmoothLogit <- function(Yhat, Vhat,
   }
   out_est
 }
-#' Title
+#' Unmatched mean smoothing only model with BYM2 area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param adj_mat
-#' @param X
-#' @param pc_u
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param detailed_output
-#' @param chains
-#' @param warmup
-#' @param iter
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param adj_mat adjacency matrix
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @export
 #'
 #' @examples
@@ -482,38 +495,38 @@ spatialMeanSmooth <- function(Yhat, Vhat,
   }
   out_est
 }
-#' Title
+#' Logit-mean smoothing only model with BYM2 area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param adj_mat
-#' @param X
-#' @param pc_u
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param detailed_output
-#' @param chains
-#' @param warmup
-#' @param iter
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param adj_mat adjacency matrix
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @export
 #'
 #' @examples
 spatialMeanSmoothLogit <- function(Yhat, Vhat,
-                              domain,
-                              adj_mat, X = NULL,
-                              pc_u = c(1, .01),
-                              var_tol = 1e-5,
-                              initf = NULL, seed = NULL,
-                              detailed_output = F,
-                              chains = 4,
-                              warmup = 2000,
-                              iter = 4000,
-                              ...) {
+                                   domain,
+                                   adj_mat, X = NULL,
+                                   pc_u = c(1, .01),
+                                   var_tol = 1e-5,
+                                   initf = NULL, seed = NULL,
+                                   detailed_output = F,
+                                   chains = 4,
+                                   warmup = 2000,
+                                   iter = 4000,
+                                   ...) {
   if(is.null(seed)) {
     seed = 20220504
   }
@@ -574,38 +587,38 @@ spatialMeanSmoothLogit <- function(Yhat, Vhat,
   }
   out_est
 }
-#' Title
+#' Mean smoothing only model with BYM2 area effects
 #'
-#' @param Yhat
-#' @param Vhat
-#' @param domain
-#' @param adj_mat
-#' @param X
-#' @param pc_u
-#' @param var_tol
-#' @param initf
-#' @param seed
-#' @param detailed_output
-#' @param chains
-#' @param warmup
-#' @param iter
-#' @param ...
+#' @param Yhat vector of direct weighted estimates
+#' @param Vhat vector of estimated variances of direct weighted estimators
+#' @param domain vector of domain labels
+#' @param adj_mat adjacency matrix
+#' @param X matrix of area level covariates
+#' @param pc_u hyperparameters for prior c(t, alpha) such that P(sigma_u > t) = alpha
+#' @param var_tol tolerance parameter; all direct estimates with Vhat below var_tol are ignored when smoothing
+#' @param initf optional stan parameter with starting parameter values
+#' @param seed random seed
+#' @param detailed_output if T, return stan object as well as estimates
+#' @param chains number of chains for Stan
+#' @param warmup number of warm up samples per chain for Stan
+#' @param iter total number of samples per chain for Stan
+#' @param ... additional parameters
 #'
-#' @return
+#' @return A data frame of summaries of the draws from the posterior, including mean, median, variance, and prediction interval
 #' @export
 #'
 #' @examples
 spatialMeanSmoothUnmatched <- function(Yhat, Vhat,
-                              domain,
-                              adj_mat, X = NULL,
-                              pc_u = c(1, .01),
-                              var_tol = 1e-5,
-                              initf = NULL, seed = NULL,
-                              detailed_output = F,
-                              chains = 4,
-                              warmup = 2000,
-                              iter = 4000,
-                              ...) {
+                                       domain,
+                                       adj_mat, X = NULL,
+                                       pc_u = c(1, .01),
+                                       var_tol = 1e-5,
+                                       initf = NULL, seed = NULL,
+                                       detailed_output = F,
+                                       chains = 4,
+                                       warmup = 2000,
+                                       iter = 4000,
+                                       ...) {
   if(is.null(seed)) {
     seed = 20220504
   }

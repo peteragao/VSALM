@@ -30,7 +30,7 @@ data {
 }
 
 parameters {
-// FIXED EFFECTS
+  // FIXED EFFECTS
   real mu;
   vector[K] betas; // covariates
 
@@ -69,7 +69,7 @@ model {
 
   target += pcprec_lpdf(1 / pow(sigma_u, 2) | pc_u_v, pc_u_alpha);
   target += normal_lpdf(u_ns | 0, 1);
-    for (i in 1:N_data) {
+  for (i in 1:N_data) {
     theta_k = ind_data[i];
     target += normal_lpdf(Yhat[i] | theta[theta_k], sqrt(Vhat[i]));
   }
