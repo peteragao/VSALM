@@ -28,20 +28,20 @@ data {
   real<lower=0> pc_tau_alpha;
 }
 parameters {
-// FIXED EFFECTS
+  // FIXED EFFECTS
   real mu;
   vector[K] betas; // covariates
 
   // RANDOM EFFECTS
   vector[N_data] u; // (scaled) area effects for sampled areas
-  real<lower=0> sigma_u; // overall standard deviation
+  real<lower=0> prec_u; // overall standard deviation
 
   // GENERALIZED VARIANCE FUNCTION
   real g0;
   real g1;
   real g2;
   vector[N_data] tau; // gvf errors;
-  real<lower=0> sigma_tau; // error in gvf
+  real<lower=0> prec_tau; // error in gvf
 
 }
 transformed parameters {
@@ -49,6 +49,10 @@ transformed parameters {
   real<lower=0> V[N_data]; // sampling errors
   real<lower=0> sigma_e[N_data]; // sampling errors
   real<lower=0> ss_cl[N_data]; // cluster sum of squares
+  real<lower=0> sigma_u;
+  real<lower=0> sigma_tau;
+  sigma_u = sqrt(1 / prec_u);
+  sigma_tau = sqrt(1 / prec_tau);
 
   for (i in 1:N) {
     theta_obs[i] = mu;
@@ -76,8 +80,8 @@ model {
   target += normal_lpdf(g1 | -1, .5);
   target += normal_lpdf(g2 | -1, .5);
 
-  target += pcprec_lpdf(1 / pow(sigma_u, 2) | pc_u_v, pc_u_alpha);
-  target += pcprec_lpdf(1 / pow(sigma_tau, 2) | pc_tau_v, pc_tau_alpha);
+  target += pcprec_lpdf(prec_u | pc_u_v, pc_u_alpha);
+  target += pcprec_lpdf(prec_tau | pc_tau_v, pc_tau_alpha);
 
   target += normal_lpdf(u | 0, 1);
   target += normal_lpdf(tau | 0, 1);

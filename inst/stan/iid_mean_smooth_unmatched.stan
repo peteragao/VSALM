@@ -32,11 +32,13 @@ parameters {
 
   // RANDOM EFFECTS
   vector[N_data] u; // (scaled) area effects for sampled areas
-  real<lower=0> sigma_u; // overall standard deviation
+  real<lower=0> prec_u; // overall standard deviation
 
 }
 transformed parameters {
   vector[N] theta_obs;
+  real<lower=0> sigma_u;
+  sigma_u = sqrt(1 / prec_u);
   // variance of each component should be approximately equal to 1
   for (i in 1:N) {
     theta_obs[i] = mu;
@@ -61,7 +63,7 @@ model {
     theta_k = ind_data[i];
     target += normal_lpdf(Yhat[i] | theta_obs[theta_k], sqrt(Vhat[i]));
   }
-  target += pcprec_lpdf(1 / pow(sigma_u, 2) | pc_u_v,  pc_u_alpha);
+  target += pcprec_lpdf(prec_u | pc_u_v,  pc_u_alpha);
   target += normal_lpdf(u | 0, 1);
 }
 generated quantities {

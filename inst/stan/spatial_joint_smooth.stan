@@ -42,7 +42,7 @@ parameters {
   // RANDOM EFFECTS
   vector[N] u_ns; // (scaled) area effects for sampled areas
 
-  real<lower=0> sigma_u; // overall standard deviation
+  real<lower=0> prec_u; // overall standard deviation
   real<lower=0, upper=1> phi; // proportion unstructured vs. spatially structured variance
   vector[N] u_sp; // spatial effects
 
@@ -51,7 +51,7 @@ parameters {
   real g1;
   real g2;
   vector[N_data] tau; // gvf errors;
-  real<lower=0> sigma_tau; // error in gvf
+  real<lower=0> prec_tau; // error in gvf
 
 }
 transformed parameters {
@@ -59,7 +59,12 @@ transformed parameters {
   real<lower=0> V[N_data]; // sampling errors
   real<lower=0> sigma_e[N_data]; // sampling errors
   real<lower=0> ss_cl[N_data]; // cluster sum of squares
+  real<lower=0> sigma_u;
+  real<lower=0> sigma_tau;
   vector[N] u;
+  sigma_u = sqrt(1 / prec_u);
+  sigma_tau = sqrt(1 / prec_tau);
+
   // variance of each component should be approximately equal to 1
   u = sqrt(1 - phi) * u_ns + sqrt(phi / scaling_factor) * u_sp;
   theta = mu + sigma_u * u;
@@ -90,8 +95,9 @@ model {
   // soft sum-to-zero constraint on u_sp)
   sum(u_sp) ~ normal(0, 0.001 * N); // equivalent to mean(u_sp) ~ normal(0,0.001)
 
-  target += pcprec_lpdf(1 / pow(sigma_u, 2) | pc_u_v, pc_u_alpha);
-  target += pcprec_lpdf(1 / pow(sigma_tau, 2) | pc_tau_v, pc_tau_alpha);
+  target += pcprec_lpdf(prec_u | pc_u_v, pc_u_alpha);
+  target += pcprec_lpdf(prec_tau | pc_tau_v, pc_tau_alpha);
+
   target += normal_lpdf(u_ns | 0, 1);
   target += normal_lpdf(tau | 0, 1);
   for (i in 1:N_data) {
