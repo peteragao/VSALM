@@ -53,7 +53,7 @@ iidMeanSmooth <- function(Yhat, Vhat,
   if (is.null(initf)) {
     initf <- function() {
       list(theta_obs = rep(.5, length(to_smooth)),
-           prec_u = runif(1, .001, .3),
+           prec_u = runif(1, 1, 10),
            u = rnorm(sum(to_smooth), 0, .1))
     }
   }
@@ -135,7 +135,7 @@ iidMeanSmoothLogit <- function(Yhat, Vhat,
   if (is.null(initf)) {
     initf <- function() {
       list(theta_obs = rep(.5, length(to_smooth)),
-           prec_u = runif(1, .001, .3),
+           prec_u = runif(1, 1, 10),
            u = rnorm(sum(to_smooth), 0, .1))
     }
   }
@@ -217,7 +217,7 @@ iidMeanSmoothUnmatched <- function(Yhat, Vhat,
   if (is.null(initf)) {
     initf <- function() {
       list(theta = rep(.5, length(to_smooth)),
-           prec_u = runif(1, .001, .3),
+           prec_u = runif(1, 1, 10),
            u = rnorm(sum(to_smooth), 0, .1))
     }
   }
@@ -308,12 +308,12 @@ iidJointSmooth <- function(Yhat, Vhat,
   if (is.null(initf)) {
     initf <- function() {
       list(theta = rep(SUMMER::logit(.05), length(to_smooth)),
-           prec_u = runif(1, .001, .3),
+           prec_u = runif(1, 1, 10),
            u = rnorm(sum(to_smooth), 0, .1),
            g0 = rnorm(1, 0, .5),
            g1 = rnorm(1, 1, .5),
            g2 = rnorm(1, 1, .5),
-           prec_tau = runif(1, .001, .3),
+           prec_tau = runif(1, 1, 10),
            tau = rnorm(sum(to_smooth), 0, .1))
     }
   }
@@ -403,12 +403,12 @@ iidJointSmoothLogit <- function(Yhat, Vhat,
   if (is.null(initf)) {
     initf <- function() {
       list(theta = rep(SUMMER::logit(.05), length(to_smooth)),
-           prec_u = runif(1, .001, .3),
+           prec_u = runif(1, 1, 10),
            u = rnorm(sum(to_smooth), 0, .1),
            g0 = rnorm(1, 0, .5),
            g1 = rnorm(1, 1, .5),
            g2 = rnorm(1, 1, .5),
-           prec_tau = runif(1, .001, .3),
+           prec_tau = runif(1, 1, 10),
            tau = rnorm(sum(to_smooth), 0, .1))
     }
   }
@@ -500,12 +500,12 @@ iidJointSmoothUnmatched <- function(Yhat, Vhat,
   if (is.null(initf)) {
     initf <- function() {
       list(theta = rep(SUMMER::logit(.05), length(to_smooth)),
-           prec_u = runif(1, .001, .3),
+           prec_u = runif(1, 1, 10),
            u = rnorm(sum(to_smooth), 0, .1),
            g0 = rnorm(1, 0, .5),
            g1 = rnorm(1, 1, .5),
            g2 = rnorm(1, 1, .5),
-           prec_tau = runif(1, .001, .3),
+           prec_tau = runif(1, 1, 10),
            tau = rnorm(sum(to_smooth), 0, .1))
     }
   }
